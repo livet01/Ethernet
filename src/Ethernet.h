@@ -135,6 +135,7 @@ private:
 	// or more calls to bufferData and then finally sent with sendUDP.
 	// return true if the datagram was successfully set up, or false if there was an error
 	static bool socketStartUDP(uint8_t s, uint8_t *addr, uint16_t port);
+	static bool socketStartUDPMac(uint8_t s, uint8_t *addr, uint8_t *mac, uint16_t port);
 	// copy up to len bytes of data from buf into a UDP datagram to be
 	// sent later by sendUDP.  Allows datagrams to be built up from a series of bufferData calls.
 	// return Number of bytes successfully buffered
