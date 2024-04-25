@@ -34,9 +34,11 @@
 /* Start EthernetUDP socket, listening at local port PORT */
 uint8_t EthernetUDP::begin(uint16_t port)
 {
-	if (sockindex < MAX_SOCK_NUM) Ethernet.socketClose(sockindex);
+	if (sockindex < MAX_SOCK_NUM)
+		Ethernet.socketClose(sockindex);
 	sockindex = Ethernet.socketBegin(SnMR::UDP, port);
-	if (sockindex >= MAX_SOCK_NUM) return 0;
+	if (sockindex >= MAX_SOCK_NUM)
+		return 0;
 	_port = port;
 	_remaining = 0;
 	return 1;
@@ -52,7 +54,8 @@ int EthernetUDP::available()
 /* Release any resources being used by this EthernetUDP instance */
 void EthernetUDP::stop()
 {
-	if (sockindex < MAX_SOCK_NUM) {
+	if (sockindex < MAX_SOCK_NUM)
+	{
 		Ethernet.socketClose(sockindex);
 		sockindex = MAX_SOCK_NUM;
 	}
@@ -67,14 +70,15 @@ int EthernetUDP::beginPacket(const char *host, uint16_t port)
 
 	dns.begin(Ethernet.dnsServerIP());
 	ret = dns.getHostByName(host, remote_addr);
-	if (ret != 1) return ret;
+	if (ret != 1)
+		return ret;
 	return beginPacket(remote_addr, port);
 }
 
 int EthernetUDP::beginPacket(IPAddress ip, uint16_t port)
 {
 	_offset = 0;
-	//Serial.printf("UDP beginPacket\n");
+	// Serial.printf("UDP beginPacket\n");
 	return Ethernet.socketStartUDP(sockindex, rawIPAddress(ip), port);
 }
 
@@ -90,7 +94,7 @@ size_t EthernetUDP::write(uint8_t byte)
 
 size_t EthernetUDP::write(const uint8_t *buffer, size_t size)
 {
-	//Serial.printf("UDP write %d\n", size);
+	// Serial.printf("UDP write %d\n", size);
 	uint16_t bytes_written = Ethernet.socketBufferData(sockindex, _offset, buffer, size);
 	_offset += bytes_written;
 	return bytes_written;
@@ -99,20 +103,23 @@ size_t EthernetUDP::write(const uint8_t *buffer, size_t size)
 int EthernetUDP::parsePacket()
 {
 	// discard any remaining bytes in the last packet
-	while (_remaining) {
+	while (_remaining)
+	{
 		// could this fail (loop endlessly) if _remaining > 0 and recv in read fails?
 		// should only occur if recv fails after telling us the data is there, lets
 		// hope the w5100 always behaves :)
 		read((uint8_t *)NULL, _remaining);
 	}
 
-	if (Ethernet.socketRecvAvailable(sockindex) > 0) {
-		//HACK - hand-parse the UDP packet using TCP recv method
+	if (Ethernet.socketRecvAvailable(sockindex) > 0)
+	{
+		// HACK - hand-parse the UDP packet using TCP recv method
 		uint8_t tmpBuf[8];
-		int ret=0;
-		//read 8 header bytes and get IP and port from it
+		int ret = 0;
+		// read 8 header bytes and get IP and port from it
 		ret = Ethernet.socketRecv(sockindex, tmpBuf, 8);
-		if (ret > 0) {
+		if (ret > 0)
+		{
 			_remoteIP = tmpBuf;
 			_remotePort = tmpBuf[4];
 			_remotePort = (_remotePort << 8) + tmpBuf[5];
@@ -132,7 +139,8 @@ int EthernetUDP::read()
 {
 	uint8_t byte;
 
-	if ((_remaining > 0) && (Ethernet.socketRecv(sockindex, &byte, 1) > 0)) {
+	if ((_remaining > 0) && (Ethernet.socketRecv(sockindex, &byte, 1) > 0))
+	{
 		// We read things without any problems
 		_remaining--;
 		return byte;
@@ -144,19 +152,24 @@ int EthernetUDP::read()
 
 int EthernetUDP::read(unsigned char *buffer, size_t len)
 {
-	if (_remaining > 0) {
+	if (_remaining > 0)
+	{
 		int got;
-		if (_remaining <= len) {
+		if (_remaining <= len)
+		{
 			// data should fit in the buffer
 			got = Ethernet.socketRecv(sockindex, buffer, _remaining);
-		} else {
+		}
+		else
+		{
 			// too much data for the buffer,
 			// grab as much as will fit
 			got = Ethernet.socketRecv(sockindex, buffer, len);
 		}
-		if (got > 0) {
+		if (got > 0)
+		{
 			_remaining -= got;
-			//Serial.printf("UDP read %d\n", got);
+			// Serial.printf("UDP read %d\n", got);
 			return got;
 		}
 	}
@@ -169,7 +182,8 @@ int EthernetUDP::peek()
 	// Unlike recv, peek doesn't check to see if there's any data available, so we must.
 	// If the user hasn't called parsePacket yet then return nothing otherwise they
 	// may get the UDP header
-	if (sockindex >= MAX_SOCK_NUM || _remaining == 0) return -1;
+	if (sockindex >= MAX_SOCK_NUM || _remaining == 0)
+		return -1;
 	return Ethernet.socketPeek(sockindex);
 }
 
@@ -181,9 +195,11 @@ void EthernetUDP::flush()
 /* Start EthernetUDP socket, listening at local port PORT */
 uint8_t EthernetUDP::beginMulticast(IPAddress ip, uint16_t port)
 {
-	if (sockindex < MAX_SOCK_NUM) Ethernet.socketClose(sockindex);
+	if (sockindex < MAX_SOCK_NUM)
+		Ethernet.socketClose(sockindex);
 	sockindex = Ethernet.socketBeginMulticast(SnMR::UDP | SnMR::MULTI, ip, port);
-	if (sockindex >= MAX_SOCK_NUM) return 0;
+	if (sockindex >= MAX_SOCK_NUM)
+		return 0;
 	_port = port;
 	_remaining = 0;
 	return 1;
