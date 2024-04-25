@@ -143,6 +143,7 @@ private:
 	// calls to bufferData.
 	// return true if the datagram was successfully sent, or false if there was an error
 	static bool socketSendUDP(uint8_t s);
+	static bool socketSendMacUDP(uint8_t s);
 	// Initialize the "random" source port number
 	static void socketPortRand(uint16_t n);
 };
@@ -177,9 +178,11 @@ public:
 	// Start building up a packet to send to the remote host specific in host and port
 	// Returns 1 if successful, 0 if there was a problem resolving the hostname or port
 	virtual int beginPacket(const char *host, uint16_t port);
+	virtual int beginPacket(IPAddress ip, uint8_t *mac_address, uint16_t port);
 	// Finish off this packet and send it
 	// Returns 1 if the packet was sent successfully, 0 if there was an error
 	virtual int endPacket();
+	virtual int endMacPacket();
 	// Write a single byte into the packet
 	virtual size_t write(uint8_t);
 	// Write size bytes from buffer into the packet

@@ -557,6 +557,21 @@ bool EthernetClass::socketStartUDP(uint8_t s, uint8_t *addr, uint16_t port)
 	return true;
 }
 
+bool EthernetClass::socketStartUDPMac(uint8_t s, uint8_t *addr, uint8_t *mac, uint16_t port)
+{
+	if (((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) ||
+		((port == 0x00)))
+	{
+		return false;
+	}
+	SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
+	W5100.writeSnDIPR(s, addr);
+	W5100.writeSnDHAR(s, mac);
+	W5100.writeSnDPORT(s, port);
+	SPI.endTransaction();
+	return true;
+}
+
 bool EthernetClass::socketSendUDP(uint8_t s)
 {
 	SPI.beginTransaction(SPI_ETHERNET_SETTINGS);

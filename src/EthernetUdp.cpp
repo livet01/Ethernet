@@ -82,9 +82,21 @@ int EthernetUDP::beginPacket(IPAddress ip, uint16_t port)
 	return Ethernet.socketStartUDP(sockindex, rawIPAddress(ip), port);
 }
 
+int EthernetUDP::beginPacket(IPAddress ip, uint8_t *mac_address, uint16_t port)
+{
+	_offset = 0;
+	// Serial.printf("UDP beginPacket\n");
+	return Ethernet.socketStartUDPMac(sockindex, rawIPAddress(ip), mac_address, port);
+}
+
 int EthernetUDP::endPacket()
 {
 	return Ethernet.socketSendUDP(sockindex);
+}
+
+int EthernetUDP::endMacPacket()
+{
+	return Ethernet.socketSendMacUDP(sockindex);
 }
 
 size_t EthernetUDP::write(uint8_t byte)
